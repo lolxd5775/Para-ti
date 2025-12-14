@@ -113,7 +113,9 @@
 
       function crearEstrellas() {
         estrellas.length = 0;
-        for (let i = 0; i < (esMovil ? 60 : 140); i++) {
+        const totalEstrellas = window.innerWidth < 768 ? 50 : 140;
+         for (let i = 0; i < totalEstrellas; i++) {
+
           estrellas.push({
             x: Math.random() * canvas.width,
             y: Math.random() * canvas.height,
@@ -138,7 +140,8 @@
         const compensacionY = (t.largo || 0);
         // Altura base uniforme para todos (mismo largo visual)
         // Largo general de los tulipanes (ajustado)
-        const alturaBase = 270;
+        const alturaBase = window.innerWidth < 768 ? 380 : 270;
+
         // Altura visual IGUAL para todos los tulipanes
         // Largo del tallo: base + ajuste individual
         const altura = (alturaBase + (t.largo || 0)) * p;
@@ -180,8 +183,10 @@
         ctx.fillStyle = '#c77dff';
 
         // Tamaño de la flor (ancho/volumen independiente del largo)
-        const w = (esMovil ? 26 : 18) * t.tam;
-        const h = (esMovil ? 52 : 36) * t.tam;
+        const escalaFlor = window.innerWidth < 768 ? 1.8 : 1;
+        const w = 16 * t.tam * escalaFlor;
+        const h = 30 * t.tam * escalaFlor;
+
 
         // pétalo central
         ctx.beginPath();
@@ -239,7 +244,7 @@
           ctx.fill();
         });
 
-        if (!esMovil && Math.random() < 0.012) estrellaFugaz();
+        if (window.innerWidth >= 768 && Math.random() < 0.012) estrellaFugaz();
 
         fugaces.forEach((f, i) => {
           ctx.strokeStyle = 'rgba(255,255,255,0.8)';
@@ -258,7 +263,9 @@
 
         // Posición base del ramo (un poco más arriba, pero conservando el largo)
         // Subimos el ramo para que no quede tan abajo
-        const baseY = canvas.height - 260;
+        const esMovil = window.innerWidth < 768;
+        const baseY = esMovil ? canvas.height * 0.6 : canvas.height - 260;
+
         tulipanes.forEach(t => {
           if (progresoGlobal > t.delay) {
             const p = Math.min(1, (progresoGlobal - t.delay) * 1.1);
