@@ -10,6 +10,18 @@
       background: radial-gradient(circle at bottom, #0a0a2a, #000010);
       overflow: hidden; display: flex; align-items: center; justify-content: center; color: white;
     }
+
+    /* Forzar vista horizontal en celulares en vertical */
+    @media screen and (orientation: portrait) {
+      body {
+        transform: rotate(90deg);
+        transform-origin: center;
+        width: 100vh;
+        height: 100vw;
+        position: absolute;
+        top: 0; left: 0;
+      }
+    }
     #inicio { position: absolute; z-index: 10; }
     button {
       padding: 18px 40px; font-size: 1.4rem; border-radius: 40px; border: none;
@@ -68,8 +80,14 @@
       const btnCerrar = document.getElementById('cerrarCarta');
 
       function resize() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        // Ajuste correcto de canvas en horizontal forzado
+        if (window.innerHeight > window.innerWidth) {
+          canvas.width = window.innerHeight;
+          canvas.height = window.innerWidth;
+        } else {
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+        }
       }
       resize();
       window.addEventListener('resize', resize);
