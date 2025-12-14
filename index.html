@@ -77,6 +77,9 @@
       let tiempo = 0;
       let progresoGlobal = 0;
 
+      // Ajustes de rendimiento para móvil
+      const esMovil = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
       const tulipanes = [
         // TODOS nacen del MISMO punto
         // largo controla SOLO el tallo (positivo = más largo)
@@ -110,7 +113,7 @@
 
       function crearEstrellas() {
         estrellas.length = 0;
-        for (let i = 0; i < 140; i++) {
+        for (let i = 0; i < (esMovil ? 60 : 140); i++) {
           estrellas.push({
             x: Math.random() * canvas.width,
             y: Math.random() * canvas.height,
@@ -172,13 +175,13 @@
         ctx.shadowBlur = 0;
 
         // Cabeza del tulipán – pétalos MÁS definidos y visibles
-        ctx.shadowBlur = 35;
+        ctx.shadowBlur = esMovil ? 18 : 35;
         ctx.shadowColor = '#e9a6ff';
         ctx.fillStyle = '#c77dff';
 
         // Tamaño de la flor (ancho/volumen independiente del largo)
-        const w = 18 * t.tam;
-        const h = 36 * t.tam;
+        const w = (esMovil ? 26 : 18) * t.tam;
+        const h = (esMovil ? 52 : 36) * t.tam;
 
         // pétalo central
         ctx.beginPath();
@@ -236,7 +239,7 @@
           ctx.fill();
         });
 
-        if (Math.random() < 0.012) estrellaFugaz();
+        if (!esMovil && Math.random() < 0.012) estrellaFugaz();
 
         fugaces.forEach((f, i) => {
           ctx.strokeStyle = 'rgba(255,255,255,0.8)';
