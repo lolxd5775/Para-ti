@@ -75,6 +75,7 @@
       window.addEventListener('resize', resize);
 
       let tiempo = 0;
+      let ultimoFrame = 0; // control FPS
       let progresoGlobal = 0;
 
       // Ajustes de rendimiento para móvil
@@ -113,9 +114,7 @@
 
       function crearEstrellas() {
         estrellas.length = 0;
-        const totalEstrellas = window.innerWidth < 768 ? 50 : 140;
-         for (let i = 0; i < totalEstrellas; i++) {
-
+        for (let i = 0; i < (esMovil ? 60 : 140); i++) {
           estrellas.push({
             x: Math.random() * canvas.width,
             y: Math.random() * canvas.height,
@@ -140,7 +139,8 @@
         const compensacionY = (t.largo || 0);
         // Altura base uniforme para todos (mismo largo visual)
         // Largo general de los tulipanes (ajustado)
-        const alturaBase = window.innerWidth < 768 ? 380 : 270;
+        // Altura base optimizada (más grande y uniforme)
+        const alturaBase = esMovil ? 420 : 300;
 
         // Altura visual IGUAL para todos los tulipanes
         // Largo del tallo: base + ajuste individual
@@ -154,7 +154,7 @@
 
         // Tallo
         ctx.strokeStyle = '#39ffb6';
-        ctx.lineWidth = 4;
+        ctx.lineWidth = esMovil ? 5 : 4;
         ctx.beginPath();
         ctx.moveTo(0, 0);
         ctx.quadraticCurveTo(0, -altura * 0.6, 0, -altura);
@@ -183,10 +183,9 @@
         ctx.fillStyle = '#c77dff';
 
         // Tamaño de la flor (ancho/volumen independiente del largo)
-        const escalaFlor = window.innerWidth < 768 ? 1.8 : 1;
-        const w = 16 * t.tam * escalaFlor;
-        const h = 30 * t.tam * escalaFlor;
-
+        // Flor MÁS grande y visible
+        const w = (esMovil ? 34 : 20) * t.tam;
+        const h = (esMovil ? 68 : 42) * t.tam;
 
         // pétalo central
         ctx.beginPath();
@@ -232,19 +231,30 @@
         carta.style.display = 'none';
       });
 
-      function animar() {
+      function animar(timestamp) {
+        // Limitar FPS en móvil para evitar lag
+        if (esMovil) {
+          if (timestamp - ultimoFrame < 33) { // ~30fps
+            requestAnimationFrame(animar);
+            return;
+          }
+          ultimoFrame = timestamp;
+        }
         tiempo += 0.02;
+        // Limpieza optimizada
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         // Estrellas
         ctx.fillStyle = 'white';
+        // Dibujar estrellas (muy liviano)
         estrellas.forEach(e => {
           ctx.beginPath();
           ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2);
           ctx.fill();
         });
 
-        if (window.innerWidth >= 768 && Math.random() < 0.012) estrellaFugaz();
+        // Estrellas fugaces solo escritorio
+        if (!esMovil && Math.random() < 0.01) estrellaFugaz();
 
         fugaces.forEach((f, i) => {
           ctx.strokeStyle = 'rgba(255,255,255,0.8)';
@@ -263,9 +273,8 @@
 
         // Posición base del ramo (un poco más arriba, pero conservando el largo)
         // Subimos el ramo para que no quede tan abajo
-        const esMovil = window.innerWidth < 768;
-        const baseY = esMovil ? canvas.height * 0.6 : canvas.height - 260;
-
+        // Posición del ramo (más centrado y grande en móvil)
+        const baseY = esMovil ? canvas.height * 0.55 : canvas.height - 260;
         tulipanes.forEach(t => {
           if (progresoGlobal > t.delay) {
             const p = Math.min(1, (progresoGlobal - t.delay) * 1.1);
